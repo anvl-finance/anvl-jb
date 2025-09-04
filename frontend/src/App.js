@@ -1,6 +1,6 @@
 import React from "react";
 import "./App.css";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { Toaster } from "./components/ui/toaster";
 import WalletConnect from "./components/auth/WalletConnect";
@@ -42,7 +42,7 @@ function App() {
   return (
     <AuthProvider>
       <div className="App bg-gray-950 min-h-screen">
-        <BrowserRouter>
+        <HashRouter>
           <Routes>
             <Route path="/connect" element={<WalletConnect />} />
             
@@ -215,7 +215,7 @@ function App() {
             <Route path="/" element={<DefaultRedirect />} />
           </Routes>
           <Toaster />
-        </BrowserRouter>
+        </HashRouter>
       </div>
     </AuthProvider>
   );
