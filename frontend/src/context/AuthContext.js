@@ -1,167 +1,119 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { dealerAPI } from '../services/api';
-import { mockDealer } from '../mock/mockData';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { dealerAPI } from "../services/api";
+import useLocalStorageState from "use-local-storage-state";
+import { mockDealer } from "../mock/mockData";
+import { web3Accounts, web3Enable } from "@polkadot/extension-dapp";
 
 const AuthContext = createContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
 
 export const AuthProvider = ({ children }) => {
-  const [isConnected, setIsConnected] = useState(false);
-  const [walletAddress, setWalletAddress] = useState('');
-  const [dealer, setDealer] = useState(null);
+  const [isConnected, setIsConnected] = useLocalStorageState(
+    "anvl_wallet_connected",
+    { defaultValue: false },
+  );
+  const [walletAddress, setWalletAddress] = useLocalStorageState(
+    "anvl_wallet_address",
+    { defaultValue: "" },
+  );
+  const [dealer, setDealer] = useLocalStorageState("anvl_dealer_data", {
+    defaultValue: null,
+  });
   const [isLoading, setIsLoading] = useState(false);
 
-  // Auto-connect for testing if URL contains test parameter
-  const autoConnectForTesting = async () => {
-    try {
-      console.log('Attempting auto-connection for testing environment...');
-      const response = await dealerAPI.getDealerByWallet('0x742d35Cc6635C0532925a3b8D40120f4');
-      console.log('Auto-connection API response:', response);
-      
-      // Normalize the dealer data to match expected property names
-      const normalizedDealer = {
-        ...response.data,
-        wallet_address: response.data.walletAddress,
-        anvl_tokens: response.data.anvilTokens,
-        active_loans: response.data.activeLoans
-      };
-      
-      setDealer(normalizedDealer);
-      setWalletAddress('0x742d35Cc6635C0532925a3b8D40120f4');
-      setIsConnected(true);
-      
-      localStorage.setItem('anvl_wallet_connected', 'true');
-      localStorage.setItem('anvl_wallet_address', '0x742d35Cc6635C0532925a3b8D40120f4');
-      localStorage.setItem('anvl_dealer_data', JSON.stringify(normalizedDealer));
-      
-      console.log('Auto-connection successful, state updated');
-      return true;
-    } catch (error) {
-      console.error('Auto-connect failed:', error);
-      return false;
-    }
-  };
-
-  // Simulate wallet connection and API integration
   const connectWallet = async () => {
     setIsLoading(true);
+
     try {
-      // Simulate MetaMask connection delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Mock wallet address for demo
-      const mockWalletAddress = '0x742d35Cc6635C0532925a3b8D40120f4';
-      
-      // Try to connect with existing dealer or create new one
-      try {
-        // Check if dealer exists by wallet address
-        const response = await dealerAPI.getDealerByWallet(mockWalletAddress);
-        
-        // Normalize the dealer data to match expected property names
-        const normalizedDealer = {
-          ...response.data,
-          wallet_address: response.data.walletAddress,
-          anvl_tokens: response.data.anvilTokens,
-          active_loans: response.data.activeLoans
+      // Check if Polkadot extension is available
+      if (typeof window.injectedWeb3 === "undefined") {
+        return {
+          success: false,
+          error:
+            "Polkadot extension not found. Please install a Polkadot wallet extension.",
         };
-        
-        setDealer(normalizedDealer);
-        setWalletAddress(mockWalletAddress);
-        setIsConnected(true);
-        
-        // Store in localStorage for persistence
-        localStorage.setItem('anvl_wallet_connected', 'true');
-        localStorage.setItem('anvl_wallet_address', mockWalletAddress);
-        localStorage.setItem('anvl_dealer_data', JSON.stringify(normalizedDealer));
-        
-        return { success: true, address: mockWalletAddress };
-      } catch (error) {
-        if (error.response?.status === 404) {
-          // Create new dealer profile
-          const newDealerData = {
-            name: 'Sunset Motors',
-            address: '123 Main St, Los Angeles, CA 90210',
-            phone: '+1 (555) 123-4567',
-            email: 'admin@sunsetmotors.com',
-            wallet_address: mockWalletAddress
-          };
-          
-          const response = await dealerAPI.connectWallet(newDealerData);
-          const normalizedDealer = {
-            ...response.data,
-            wallet_address: response.data.walletAddress,
-            anvl_tokens: response.data.anvilTokens,
-            active_loans: response.data.activeLoans
-          };
-          
-          setDealer(normalizedDealer);
-          setWalletAddress(mockWalletAddress);
-          setIsConnected(true);
-          
-          // Store in localStorage for persistence
-          localStorage.setItem('anvl_wallet_connected', 'true');
-          localStorage.setItem('anvl_wallet_address', mockWalletAddress);
-          localStorage.setItem('anvl_dealer_data', JSON.stringify(normalizedDealer));
-          
-          return { success: true, address: mockWalletAddress };
-        } else {
-          throw error;
-        }
       }
+
+      // Enable the extension
+      const extensions = await web3Enable("ANVL Finance");
+      if (extensions.length === 0) {
+        return {
+          success: false,
+          error:
+            "No Polkadot extension found. Please install and enable a wallet.",
+        };
+      }
+
+      // Get accounts from extension
+      const accounts = await web3Accounts();
+      if (accounts.length === 0) {
+        return {
+          success: false,
+          error:
+            "No accounts found. Please create or import an account in your wallet.",
+        };
+      }
+
+      // For simplicity, use the first account
+      const account = accounts[0];
+
+      // Create dealer object with wallet info
+      const dealerData = {
+        ...mockDealer,
+        walletAddress: account.address,
+      };
+
+      // Update authentication state
+      setIsConnected(true);
+      setWalletAddress(account.address);
+      setDealer(dealerData);
+
+      return {
+        success: true,
+        address: account.address,
+      };
     } catch (error) {
-      console.error('Wallet connection failed:', error);
-      return { success: false, error: error.message };
+      console.error("Failed to connect Polkadot wallet:", error);
+
+      return {
+        success: false,
+        error: error.message,
+      };
     } finally {
       setIsLoading(false);
     }
   };
 
-  const disconnectWallet = () => {
-    setIsConnected(false);
-    setWalletAddress('');
-    setDealer(null);
-    
-    // Clear localStorage
-    localStorage.removeItem('anvl_wallet_connected');
-    localStorage.removeItem('anvl_wallet_address');
-    localStorage.removeItem('anvl_dealer_data');
+  const connectMockWallet = async () => {
+    setIsLoading(true);
+
+    // Simulate connection delay
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    setIsConnected(true);
+    setWalletAddress(mockDealer.walletAddress);
+    setDealer(mockDealer);
+
+    setIsLoading(false);
+
+    return {
+      success: true,
+      address: mockDealer.walletAddress,
+    };
   };
 
-  // Check for existing connection on mount
-  useEffect(() => {
-    const init = async () => {
-      // Check URL for testing parameter
-      const urlParams = new URLSearchParams(window.location.search);
-      const isPreviewEnv = window.location.hostname.includes('preview');
-      
-      if (urlParams.get('test') === 'auto' || isPreviewEnv) {
-        console.log('Auto-connecting for testing environment...');
-        console.log('Is preview environment:', isPreviewEnv);
-        const success = await autoConnectForTesting();
-        console.log('Auto-connection result:', success);
-        return;
-      }
-
-      const savedConnection = localStorage.getItem('anvl_wallet_connected');
-      const savedAddress = localStorage.getItem('anvl_wallet_address');
-      const savedDealer = localStorage.getItem('anvl_dealer_data');
-      
-      if (savedConnection === 'true' && savedAddress && savedDealer) {
-        setIsConnected(true);
-        setWalletAddress(savedAddress);
-        setDealer(JSON.parse(savedDealer));
-      }
-    };
-
-    init();
-  }, []);
+  const disconnectWallet = () => {
+    setIsConnected(false);
+    setWalletAddress("");
+    setDealer(null);
+  };
 
   const value = {
     isConnected,
@@ -169,7 +121,8 @@ export const AuthProvider = ({ children }) => {
     dealer,
     isLoading,
     connectWallet,
-    disconnectWallet
+    connectMockWallet,
+    disconnectWallet,
   };
 
   return (
