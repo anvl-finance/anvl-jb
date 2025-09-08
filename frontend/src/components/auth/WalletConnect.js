@@ -6,7 +6,7 @@ import { Wallet } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const WalletConnect = () => {
-  const { connectWallet, isLoading, isConnected } = useAuth();
+  const { connectWallet, connectMockWallet, isLoading, isConnected } = useAuth();
   const navigate = useNavigate();
   
   // Redirect to dashboard if already connected
@@ -41,12 +41,15 @@ const WalletConnect = () => {
           <CardHeader className="text-center pb-4">
             <CardTitle className="text-lg font-semibold text-white">Connect Your Wallet</CardTitle>
             <CardDescription className="text-sm text-gray-400">
-              Connect your Ethereum wallet to get started
+              Connect your crypto wallet to get started
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Button
-              onClick={connectWallet}
+              onClick={async () => {
+                const result = await connectWallet();
+                if (!result.success) alert(result.error);
+              }}
               disabled={isLoading}
               className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-3 text-base"
             >
@@ -58,21 +61,30 @@ const WalletConnect = () => {
               ) : (
                 <div className="flex items-center justify-center space-x-2">
                   <Wallet className="h-5 w-5" />
-                  <span>Connect MetaMask</span>
+                  <span>Connect SubWallet</span>
                 </div>
               )}
             </Button>
             
             <div className="text-center pt-2">
               <p className="text-sm text-gray-400">
-                New to MetaMask?{' '}
+                New to SubWallet?{' '}
                 <a 
-                  href="https://metamask.io/download/" 
+                  href="https://www.subwallet.app/download"
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-blue-400 hover:text-blue-300 underline"
                 >
                   Install here
+                </a>
+                {', or continue in '}
+                <a
+                  href="#"
+                  rel="noopener noreferrer"
+                  onClick={connectMockWallet}
+                  className="text-blue-400 hover:text-blue-300 underline"
+                >
+                  demo mode
                 </a>
               </p>
             </div>
