@@ -9,7 +9,7 @@ export const mockDealer = {
   walletAddress: '0x742d35Cc6635C0532925a3b8D40120f4',
   achConnected: true,
   kycStatus: 'approved',
-  anvilTokens: 2500,
+  anvlTokens: 2500,
   totalLoaned: 485000,
   totalRepaid: 320000,
   activeLoans: 3

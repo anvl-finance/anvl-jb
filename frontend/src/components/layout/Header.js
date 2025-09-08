@@ -45,8 +45,8 @@ const Header = () => {
               {/* ANVL Tokens */}
               <div className="flex items-center space-x-1">
                 <Badge variant="secondary" className="bg-purple-900 text-purple-200 text-xs px-2 py-1">
-                  <span className="hidden sm:inline">{dealer?.anvl_tokens || 0} ANVL</span>
-                  <span className="sm:hidden">{dealer?.anvl_tokens || 0}</span>
+                  <span className="hidden sm:inline">{dealer?.anvlTokens || 0} ANVL</span>
+                  <span className="sm:hidden">{dealer?.anvlTokens || 0}</span>
                 </Badge>
               </div>
 
@@ -69,7 +69,7 @@ const Header = () => {
                   <Button variant="outline" className="flex items-center space-x-1 bg-gray-800 border-gray-700 text-white hover:bg-gray-700 text-xs px-2 py-1.5">
                     <Wallet className="h-3 w-3 md:h-4 md:w-4 flex-shrink-0" />
                     <span className="hidden sm:inline truncate max-w-20">
-                      {formatAddress(dealer?.wallet_address)}
+                      {formatAddress(dealer?.walletAddress)}
                     </span>
                   </Button>
                 </DropdownMenuTrigger>

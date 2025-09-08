@@ -98,7 +98,7 @@ const Sidebar = () => {
             <div className="space-y-2">
               <div className="flex justify-between text-xs">
                 <span className="text-gray-400">Active Loans:</span>
-                <span className="text-white font-medium">{dealer?.active_loans || 0}</span>
+                <span className="text-white font-medium">{dealer?.activeLoans || 0}</span>
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-gray-400">Vehicles:</span>
@@ -106,7 +106,7 @@ const Sidebar = () => {
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-gray-400">ANVL Tokens:</span>
-                <span className="text-purple-400 font-medium">{dealer?.anvl_tokens || 0}</span>
+                <span className="text-purple-400 font-medium">{dealer?.anvlTokens || 0}</span>
               </div>
             </div>
           </div>
@@ -178,7 +178,7 @@ const Sidebar = () => {
               <div className="space-y-2">
                 <div className="flex justify-between text-xs">
                   <span className="text-gray-400">Active Loans:</span>
-                  <span className="text-white font-medium">{dealer?.active_loans || 0}</span>
+                  <span className="text-white font-medium">{dealer?.activeLoans || 0}</span>
                 </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-gray-400">Vehicles:</span>
@@ -186,7 +186,7 @@ const Sidebar = () => {
                 </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-gray-400">ANVL Tokens:</span>
-                  <span className="text-purple-400 font-medium">{dealer?.anvl_tokens || 0}</span>
+                  <span className="text-purple-400 font-medium">{dealer?.anvlTokens || 0}</span>
                 </div>
               </div>
             </div>

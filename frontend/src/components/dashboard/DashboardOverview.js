@@ -81,7 +81,7 @@ const DashboardOverview = () => {
     },
     {
       title: 'ANVL Tokens',
-      value: dealer?.anvl_tokens || 0,
+      value: dealer?.anvlTokens || 0,
       icon: Coins,
       color: 'text-amber-400',
       bgColor: 'bg-amber-500/10',
@@ -113,7 +113,7 @@ const DashboardOverview = () => {
           </div>
           <div className="flex-shrink-0 text-left sm:text-right">
             <div className="text-xs lg:text-sm text-blue-100">Total Loaned</div>
-            <div className="text-lg lg:text-xl font-bold">{formatCurrency(dealer?.total_loaned || 0, 'USDC')}</div>
+            <div className="text-lg lg:text-xl font-bold">{formatCurrency(dealer?.totalLoaned || 0, 'USDC')}</div>
           </div>
         </div>
       </div>
