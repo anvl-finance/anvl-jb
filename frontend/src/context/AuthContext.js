@@ -15,6 +15,10 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
+  const [isDemo, setIsDemo] = useLocalStorageState(
+    "anvl_demo",
+    { defaultValue: false },
+  );
   const [isConnected, setIsConnected] = useLocalStorageState(
     "anvl_wallet_connected",
     { defaultValue: false },
@@ -72,6 +76,7 @@ export const AuthProvider = ({ children }) => {
 
       // Update authentication state
       setIsConnected(true);
+      setIsDemo(false);
       setWalletAddress(account.address);
       setDealer(dealerData);
 
@@ -98,6 +103,7 @@ export const AuthProvider = ({ children }) => {
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
     setIsConnected(true);
+    setIsDemo(true);
     setWalletAddress(mockDealer.walletAddress);
     setDealer(mockDealer);
 
@@ -111,11 +117,13 @@ export const AuthProvider = ({ children }) => {
 
   const disconnectWallet = () => {
     setIsConnected(false);
+    setIsDemo(false);
     setWalletAddress("");
     setDealer(null);
   };
 
   const value = {
+    isDemo,
     isConnected,
     walletAddress,
     dealer,

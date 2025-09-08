@@ -5,7 +5,7 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API_BASE = `${BACKEND_URL}/api`;
 
 // Flag to determine if we should use mock data
-const USE_MOCK_DATA = true;
+const USE_MOCK_DATA = () => localStorage.getItem("anvl_demo") === 'true';
 
 // Create axios instance with default config
 const api = axios.create({
@@ -33,7 +33,7 @@ api.interceptors.response.use(
 // Dealer API
 export const dealerAPI = {
   connectWallet: async (dealerData) => {
-    if (USE_MOCK_DATA) {
+    if (USE_MOCK_DATA()) {
       // Return mock dealer data
       return { data: mockDealer };
     }
@@ -42,7 +42,7 @@ export const dealerAPI = {
   },
 
   getDealer: async (dealerId) => {
-    if (USE_MOCK_DATA) {
+    if (USE_MOCK_DATA()) {
       return { data: mockDealer };
     }
     const response = await api.get(`/dealers/${dealerId}`);
@@ -50,7 +50,7 @@ export const dealerAPI = {
   },
 
   getDealerByWallet: async (walletAddress) => {
-    if (USE_MOCK_DATA) {
+    if (USE_MOCK_DATA()) {
       return { data: mockDealer };
     }
     const response = await api.get(`/dealers/wallet/${walletAddress}`);
@@ -58,7 +58,7 @@ export const dealerAPI = {
   },
 
   updateDealer: async (dealerId, updateData) => {
-    if (USE_MOCK_DATA) {
+    if (USE_MOCK_DATA()) {
       return { data: { ...mockDealer, ...updateData } };
     }
     const response = await api.put(`/dealers/${dealerId}`, updateData);
@@ -66,7 +66,7 @@ export const dealerAPI = {
   },
 
   getDealerLoans: async (dealerId) => {
-    if (USE_MOCK_DATA) {
+    if (USE_MOCK_DATA()) {
       return { data: mockLoans };
     }
     const response = await api.get(`/dealers/${dealerId}/loans`);
@@ -74,7 +74,7 @@ export const dealerAPI = {
   },
 
   getDealerVehicles: async (dealerId) => {
-    if (USE_MOCK_DATA) {
+    if (USE_MOCK_DATA()) {
       return { data: mockVehicles };
     }
     const response = await api.get(`/dealers/${dealerId}/vehicles`);
@@ -82,7 +82,7 @@ export const dealerAPI = {
   },
 
   getDealerTransactions: async (dealerId) => {
-    if (USE_MOCK_DATA) {
+    if (USE_MOCK_DATA()) {
       return { data: mockTransactions };
     }
     const response = await api.get(`/dealers/${dealerId}/transactions`);
@@ -90,7 +90,7 @@ export const dealerAPI = {
   },
 
   getDealerNotifications: async (dealerId) => {
-    if (USE_MOCK_DATA) {
+    if (USE_MOCK_DATA()) {
       return { data: mockNotifications };
     }
     const response = await api.get(`/dealers/${dealerId}/notifications`);
@@ -98,7 +98,7 @@ export const dealerAPI = {
   },
 
   markNotificationRead: async (dealerId, notificationId) => {
-    if (USE_MOCK_DATA) {
+    if (USE_MOCK_DATA()) {
       return { data: { success: true } };
     }
     const response = await api.post(`/dealers/${dealerId}/notifications/${notificationId}/mark-read`);
